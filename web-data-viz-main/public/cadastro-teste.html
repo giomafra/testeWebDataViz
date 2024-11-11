@@ -25,19 +25,7 @@
         <div class="form-container">
             <h2 class="titulo_principal">Cadastre-se aqui</h2>
             <div class="form_cointainer_empresa" id="div_form1">
-                <h3 class="titulo_form">Dados da empresa:</h3>
-                <div class="form-group">
-                    <i class="fas fa-id-card"></i>
-                    <input class="main-input" id="input_cnpj" placeholder="CNPJ" type="text" oninput="validarCNPJ()" />
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-building"></i>
-                    <input class="main-input" id="input_razao_social" placeholder="Razão social" type="text" oninput="validarRazaoSocial()" />
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-industry"></i>
-                    <input class="main-input" id="input_nome_fantasia" placeholder="Nome fantasia" type="text" oninput="validarNomeFantasia()" />
-                </div>
+                <h3 class="titulo_form">Dados do responsável:</h3>
                 <div class="form-group">
                     <i class="fas fa-user-tie"></i>
                     <input class="main-input" id="input_responsavel" placeholder="Responsável" type="text" oninput="validarResponsavel()" />
@@ -51,11 +39,26 @@
                     <input class="main-input" id="input_senha" placeholder="Senha" type="password" oninput="validarSenha()" />
                 </div>
                 <div class="form-group">
+                    <button onclick="cadastrar_responsável()">Cadastrar usuário</button><br><br>
                     <button onclick="ocultar()">Seguinte</button>
+
+
                 </div>
             </div>            
             <div class="form_container_endereco" id="div_form2"  style="display: none;">
-                <h3 class="titulo_form">Endereço:</h3> 
+                <h3 class="titulo_form">Dados da empresa:</h3> 
+                <div class="form-group">
+                    <i class="fas fa-id-card"></i>
+                    <input class="endereco-input" id="input_cnpj" placeholder="CNPJ" type="text" oninput="validarCNPJ()" />
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-building"></i>
+                    <input class="endereco-input" id="input_razao_social" placeholder="Razão social" type="text" oninput="validarRazaoSocial()" />
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-industry"></i>
+                    <input class="endereco-input" id="input_nome_fantasia" placeholder="Nome fantasia" type="text" oninput="validarNomeFantasia()" />
+                </div>
                 <div class="form-group">
                     <input class="endereco-input" id="input_cep" placeholder="CEP" type="text"  oninput="validarCEP()" />
                 </div>
@@ -111,19 +114,52 @@
         div_form2.style.display = 'none';
     }
 
-    function cadastrar() {
-        var correto = true;
+    function cadastrar_responsável(){
+        validarResponsavel();
+        validarEmail();
+        validarSenha();
 
-        // Validar todos os campos antes de cadastrar
-       
-        correto = true;
+        var responsavelVar = input_responsavel.value;
+        var emailVar = input_email.value;
+        var senhaVar = input_senha.value;
+
+        
+        fetch("/usuarios/cadastrar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                
+                responsavelServer: responsavelVar,
+                emailServer: emailVar,
+                senhaServer: senhaVar,
+               
+            }),
+        })
+        .then(function (resposta) {
+            if (resposta.status == 201) {
+                console.log("Cadastro realizado com sucesso!");
+                console.log(resposta.json)
+                div_mensagem.innerHTML = "<span style='color: green;'>Cadastro realizado com sucesso!</span>";
+            } else {
+                div_mensagem.innerHTML = "<span style='color: red;'>Erro ao cadastrar. Tente novamente.</span>";
+            }
+        })
+        .catch(function (erro) {
+            console.error("Erro:", erro);
+            div_mensagem.innerHTML = "<span style='color: red;'>Erro ao conectar ao servidor.</span>";
+        });
+
+        
+    }
+
+    function cadastrar() {
+
 
         validarCNPJ();
         validarRazaoSocial();
         validarNomeFantasia();
-        validarResponsavel();
-        validarEmail();
-        validarSenha();
         validarCEP();
         validarEstado();
         validarBairro();
@@ -143,9 +179,7 @@
 
         // Armazenar os valores dos inputs
    
-        var responsavelVar = input_responsavel.value;
-        var emailVar = input_email.value;
-        var senhaVar = input_senha.value;
+
 
         var cnpjVar = input_cnpj.value;
         var razaoSocialVar = input_razao_social.value;
@@ -169,41 +203,10 @@
         //         break;
         //     }
         // }
-
-        //ENVIANDO DADOS DO USUÁRIO
-
-        // Enviando os dados para o servidor
     
-        fetch("/usuarios/cadastrar", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                
-                responsavelServer: responsavelVar,
-                emailServer: emailVar,
-                senhaServer: senhaVar,
-               
-            }),
-        })
-        .then(function (resposta) {
-            if (resposta.ok) {
-                console.log("Cadastro realizado com sucesso!");
-                div_mensagem.innerHTML = "<span style='color: green;'>Cadastro realizado com sucesso!</span>";
-            } else {
-                div_mensagem.innerHTML = "<span style='color: red;'>Erro ao cadastrar. Tente novamente.</span>";
-            }
-        })
-        .catch(function (erro) {
-            console.error("Erro:", erro);
-            div_mensagem.innerHTML = "<span style='color: red;'>Erro ao conectar ao servidor.</span>";
-        });
-
         //ENVIANDO DADOS DA EMPRESA
         // Enviando os dados para o servidor
-    
-        fetch("/empresas/cadastrar", {
+                fetch("/empresas/cadastrar", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -235,6 +238,9 @@
             console.error("Erro:", erro);
             div_mensagem.innerHTML = "<span style='color: red;'>Erro ao conectar ao servidor.</span>";
         });
+    
+    
+        
 
     }
     

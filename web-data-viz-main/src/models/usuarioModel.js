@@ -19,6 +19,11 @@ function cadastrar(nome, email, senha) {
 
     return database.executar(instrucaoSql);
 }   
+function buscarPorId(idUsuario) {
+    var instrucaoSql = `SELECT * FROM usuario WHERE id = '${idUsuario}'`;
+  
+    return database.executar(instrucaoSql);
+  }
 
 module.exports = {
     autenticar,
